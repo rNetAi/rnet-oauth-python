@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "rnet-sso"
+version = "0.2.0b1"
+description = "rNet SSO Python client library"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+keywords = ["sso", "oauth2", "rnet", "authentication"]
+
+[project.urls]
+Homepage = "https://rnetai.org"
