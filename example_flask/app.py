@@ -1,5 +1,5 @@
 """
-rNet SSO Example — Flask Backend
+RNet SSO Example — Flask Backend
 =================================
 Run:
     pip install flask
@@ -20,7 +20,7 @@ from rnet_sso import RNetSSO
 app = Flask(__name__)
 app.secret_key = "change-me-in-production"  # Required for session
 
-# ── Initialise the rNet SSO client ───────────────────────────────────────────
+# ── Initialise the RNet SSO client ───────────────────────────────────────────
 
 client = RNetSSO(
     client_id="rnet-3d3deade",         # replace with your Client ID
@@ -44,12 +44,12 @@ def index():
         </form>
         <a href="/logout">Logout</a>
         """
-    return '<a href="/login"><button>Login with rNet</button></a>'
+    return '<a href="/login"><button>Login with RNet</button></a>'
 
 
 @app.route("/login")
 def login():
-    """Generate PKCE, save verifier in session, redirect to rNet login page."""
+    """Generate PKCE, save verifier in session, redirect to RNet login page."""
     pkce = client.generate_pkce()
     session["pkce_verifier"] = pkce["verifier"]
 

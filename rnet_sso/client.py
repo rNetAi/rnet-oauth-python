@@ -9,8 +9,8 @@ from typing import Optional, Dict, Any, Generator
 
 class RNetAuth:
     """
-    rNet Auth Python Library
-    A backend library to verify and exchange OAuth2 tokens and interact with rNet AI.
+    RNet Auth Python Library
+    A backend library to verify and exchange OAuth2 tokens and interact with rNet Ai.
     """
 
     def __init__(
@@ -105,15 +105,15 @@ class RNetAuth:
 
 class RNetAi:
     """
-    rNet AI Python Library
-    Interaction with rNet AI services.
+    rNet Ai Python Library
+    Interaction with rNet Ai services.
     """
 
     def __init__(self):
         self.ai_provider = "https://ai-provider.rnetai.org"
 
     def chat(self, body: Dict[str, Any], access_token: str, model: str) -> Dict[str, Any]:
-        """Calls the rNet AI Provider API."""
+        """Calls the rNet Ai Provider API."""
         if not access_token: raise ValueError("access_token is required")
         if not model: raise ValueError("model is required")
 
@@ -134,7 +134,7 @@ class RNetAi:
             self._handle_error(e)
 
     def chat_stream(self, body: Dict[str, Any], access_token: str, model: str) -> Generator[str, None, None]:
-        """Calls the rNet AI Provider API and returns a generator for the response stream."""
+        """Calls the rNet Ai Provider API and returns a generator for the response stream."""
         if not access_token: raise ValueError("access_token is required")
         if not model: raise ValueError("model is required")
 
