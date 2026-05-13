@@ -36,7 +36,9 @@ verifier = pkce['verifier']
 challenge = pkce['challenge']
 
 # 2. Get Authorization URL
-auth_url = auth.get_authorization_url(challenge)
+# challenge: PKCE code challenge (optional)
+# state: An optional string to maintain state between the request and callback (recommended for security)
+auth_url = auth.get_authorization_url(challenge, state='optional-state')
 ```
 
 ### 3. Exchange Code for Tokens
@@ -49,14 +51,24 @@ access_token = tokens['access_token']
 ### 4. Chat with AI
 ```python
 response = ai.chat({
-    "messages": [{"role": "user", "content": "Hello!"}]
+    "contents": [
+        {
+            "role": "user",
+            "parts": [{"text": "Hello!"}]
+        }
+    ]
 }, access_token, "gemini-2.5-flash-lite")
 ```
 
 ### 5. Streaming AI Response
 ```python
 for chunk in ai.chat_stream({
-    "messages": [{"role": "user", "content": "Hello!"}]
+    "contents": [
+        {
+            "role": "user",
+            "parts": [{"text": "Hello!"}]
+        }
+    ]
 }, access_token, "gemini-2.5-flash-lite"):
     print(chunk)
 ```

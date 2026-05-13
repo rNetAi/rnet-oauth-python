@@ -38,7 +38,7 @@ class RNetAuth:
         
         return {"verifier": verifier, "challenge": challenge}
 
-    def get_authorization_url(self, challenge: Optional[str] = None) -> str:
+    def get_authorization_url(self, challenge: Optional[str] = None, state: Optional[str] = None) -> str:
         """Generates the authorization URL."""
         params = {
             "response_type": "code",
@@ -50,6 +50,9 @@ class RNetAuth:
         if challenge:
             params["code_challenge"] = challenge
             params["code_challenge_method"] = "S256"
+            
+        if state:
+            params["state"] = state
 
         return f"{self.issuer}/oauth2/authorize?{urlencode(params)}"
 
