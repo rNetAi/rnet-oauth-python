@@ -7,11 +7,16 @@ import urllib.error
 from urllib.parse import urlencode
 from typing import Optional, Dict, Any, Generator
 
+ISSUER = "https://central-backend.rnetai.org"
+AI_PROVIDER = "https://ai-provider.rnetai.org"
+
 class RNetAuth:
     """
-    RNet Auth Python Library
+    RNet OAuth Python Library
     A backend library to verify and exchange OAuth2 tokens and interact with rNet Ai.
     """
+
+    __slots__ = ("client_id", "client_secret", "redirect_uri")
 
     def __init__(
         self,
@@ -25,8 +30,14 @@ class RNetAuth:
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
-        self.issuer = "https://central-backend.rnetai.org"
-        self.ai_provider = "https://ai-provider.rnetai.org"
+
+    @property
+    def issuer(self) -> str:
+        return ISSUER
+
+    @property
+    def ai_provider(self) -> str:
+        return AI_PROVIDER
 
     def generate_pkce(self) -> Dict[str, str]:
         """Generates a PKCE code_verifier and code_challenge."""
@@ -54,7 +65,7 @@ class RNetAuth:
         if state:
             params["state"] = state
 
-        return f"{self.issuer}/oauth2/authorize?{urlencode(params)}"
+        return f"{ISSUER}/oauth2/authorize?{urlencode(params)}"
 
     def exchange_code_for_token(self, code: str, code_verifier: Optional[str] = None) -> Dict[str, Any]:
         """Exchanges an authorization code for tokens."""
@@ -76,8 +87,28 @@ class RNetAuth:
         }
         return self._post_token(payload)
 
+    def get_user_info(self, access_token: str) -> Dict[str, Any]:
+        """Fetches the authenticated user's profile from the OAuth UserInfo endpoint."""
+        if not access_token:
+            raise ValueError("access_token is required")
+
+        req = urllib.request.Request(
+            f"{ISSUER}/userinfo",
+            headers={
+                'Accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'
+            },
+            method='GET'
+        )
+
+        try:
+            with urllib.request.urlopen(req) as response:
+                return json.loads(response.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            self._handle_error(e)
+
     def _post_token(self, payload: Dict[str, str]) -> Dict[str, Any]:
-        url = f"{self.issuer}/oauth2/token"
+        url = f"{ISSUER}/oauth2/token"
         data = urlencode(payload).encode('utf-8')
         
         auth = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode('utf-8')).decode('utf-8')
@@ -112,8 +143,11 @@ class RNetAi:
     Interaction with rNet Ai services.
     """
 
-    def __init__(self):
-        self.ai_provider = "https://ai-provider.rnetai.org"
+    __slots__ = ()
+
+    @property
+    def ai_provider(self) -> str:
+        return AI_PROVIDER
 
     def chat(self, body: Dict[str, Any], access_token: str, model: str) -> Dict[str, Any]:
         """Calls the rNet Ai Provider API."""
@@ -121,7 +155,7 @@ class RNetAi:
         if not model: raise ValueError("model is required")
 
         query = urlencode({"access_token": access_token, "model": model})
-        url = f"{self.ai_provider}/ai?{query}"
+        url = f"{AI_PROVIDER}/ai?{query}"
         
         req = urllib.request.Request(
             url,
@@ -142,7 +176,7 @@ class RNetAi:
         if not model: raise ValueError("model is required")
 
         query = urlencode({"access_token": access_token, "model": model})
-        url = f"{self.ai_provider}/ai/stream?{query}"
+        url = f"{AI_PROVIDER}/ai/stream?{query}"
         
         req = urllib.request.Request(
             url,

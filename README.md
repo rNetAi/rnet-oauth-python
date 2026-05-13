@@ -1,24 +1,25 @@
-# RNet Auth Python Library
+# RNet OAuth Python Library
 
-A Python backend library for integrating **RNet Auth** and **AI Provider** services. This library allows users to authenticate via RNet and pay for AI model token costs directly using their RNet account.
+A Python backend library for integrating **RNet OAuth** and **AI Provider** services. This library allows users to authenticate via RNet and pay for AI model token costs directly using their RNet account.
 
 ## Features
 
 - **OAuth2 PKCE Support**: Secure authorization code flow with automatic code verifier and challenge generation.
 - **Token Management**: Exchange authorization codes for tokens and refresh expired tokens.
+- **UserInfo Endpoint**: Fetch the authenticated user's RNet profile with an access token.
 - **AI Integration**: Easy methods to chat with AI models using standard or streaming responses.
 
 ## Installation
 
 ```bash
-pip install rnet-sso
+pip install rnet-oauth
 ```
 
 ## Quick Start
 
 ### 1. Initialize the Clients
 ```python
-from rnet_sso import RNetAuth, RNetAi
+from rnet_oauth import RNetAuth, RNetAi
 
 auth = RNetAuth(
     client_id='client-id',
@@ -48,7 +49,17 @@ tokens = auth.exchange_code_for_token(code, verifier)
 access_token = tokens['access_token']
 ```
 
-### 4. Chat with AI
+### 4. Get User Info
+```python
+user_info = auth.get_user_info(access_token)
+print(user_info['email'])
+print(user_info['name'])
+```
+
+The UserInfo response comes from RNet's `/userinfo` endpoint and may include:
+`sub`, `email`, `email_verified`, `name`, `preferred_username`, `user_id`, `role`, and `status`.
+
+### 5. Chat with AI
 ```python
 response = ai.chat({
     "contents": [
@@ -60,7 +71,7 @@ response = ai.chat({
 }, access_token, "gemini-2.5-flash-lite")
 ```
 
-### 5. Streaming AI Response
+### 6. Streaming AI Response
 ```python
 for chunk in ai.chat_stream({
     "contents": [

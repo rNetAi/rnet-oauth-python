@@ -3,18 +3,18 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rnet-sso"
+name = "rnet-oauth"
 version = "1.0.0"
-description = "RNet SSO Python client library"
+description = "RNet OAuth Python client library"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
 authors = [{name = "rNet Ai"}]
-keywords = ["sso", "oauth2", "rnet", "authentication"]
+keywords = ["oauth2", "rnet", "authentication"]
 
 [project.urls]
 Homepage = "https://rnetai.org"
-Repository = "https://github.com/rNetAi/rnet-sso-python"
+Repository = "https://github.com/rNetAi/rnet-oauth-python"
 
 [tool.setuptools]
-packages = ["rnet_sso"]
+packages = ["rnet_oauth"]

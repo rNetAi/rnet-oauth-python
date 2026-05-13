@@ -1,5 +1,5 @@
 """
-RNet SSO Example — Flask Backend
+RNet OAuth Example — Flask Backend
 =================================
 Run:
     pip install flask
@@ -11,22 +11,21 @@ Then open:  http://localhost:5000
 import sys
 import os
 
-# Allow importing rnet_sso from the sibling package folder during development
+# Allow importing rnet_oauth from the sibling package folder during development
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from flask import Flask, redirect, request, session, jsonify, url_for
-from rnet_sso import RNetSSO
+from rnet_oauth import RNetAuth, RNetAi
 
 app = Flask(__name__)
 app.secret_key = "change-me-in-production"  # Required for session
 
-# ── Initialise the RNet SSO client ───────────────────────────────────────────
+# ── Initialise the RNet OAuth client ───────────────────────────────────────────
 
-client = RNetSSO(
-    client_id="rnet-3d3deade",         # replace with your Client ID
-    client_secret="dd6a0f9a-aaa1-4aa7-acaa-4cf25bedb4d7",  # replace with your Client Secret
-    redirect_uri="http://localhost:5000/callback",
-    issuer="http://localhost:9123",
+client = RNetAuth(
+    client_id="rnet-xxxxxxxxx",         # replace with your Client ID
+    client_secret="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",  # replace with your Client Secret
+    redirect_uri="http://localhost:5000/callback"
 )
 
 # ── Routes ───────────────────────────────────────────────────────────────────
@@ -37,10 +36,10 @@ def index():
     tokens = session.get("tokens")
     if tokens:
         return f"""
-        <h2>✅ Authenticated!</h2>
+        <h2>Authenticated!</h2>
         <pre>{__import__('json').dumps(tokens, indent=2)}</pre>
         <form method="POST" action="/refresh">
-            <button type="submit">🔄 Refresh Token</button>
+            <button type="submit">Refresh Token</button>
         </form>
         <a href="/logout">Logout</a>
         """
