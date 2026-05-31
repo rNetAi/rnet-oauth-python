@@ -71,7 +71,7 @@ response = ai.chat({
 }, access_token, "gemini-2.5-flash-lite")
 ```
 
-### 6. Streaming AI Response
+### 6. Streaming AI Response (Untested)
 ```python
 for chunk in ai.chat_stream({
     "contents": [
@@ -82,6 +82,47 @@ for chunk in ai.chat_stream({
     ]
 }, access_token, "gemini-2.5-flash-lite"):
     print(chunk)
+```
+
+### 7. File Upload (Untested)
+```python
+with open("document.pdf", "rb") as f:
+    file_buffer = f.read()
+
+# Upload to Gemini
+gemini_upload = ai.gemini_file_upload(access_token, "gemini-2.5-flash-lite", file_buffer, "application/pdf", "document.pdf")
+print(gemini_upload['fileReference']) # Use this in chat payload
+
+# Upload to OpenAI
+openai_upload = ai.openai_file_upload(access_token, "gpt-4o", file_buffer, "application/pdf", "document.pdf")
+```
+
+### 8. File Deletion (Untested)
+```python
+# Gemini files auto-delete after 48 hours, so there is no delete method.
+# Delete an OpenAI file:
+ai.openai_file_delete(access_token, "gpt-4o", openai_upload['fileReference'])
+```
+
+### 9. AI Chat with File & Tools (Untested)
+```python
+payload = {
+    "contents": [
+        {
+            "role": "user",
+            "parts": [
+                { "text": "Based on this document, what is my name? Also search the web for the current weather in London." },
+                { "fileData": { "fileUri": gemini_upload['fileReference'], "mimeType": gemini_upload['mimeType'] } }
+            ]
+        }
+    ],
+    "tools": [
+        { "googleSearch": {} } # Enable Google Search tool
+    ]
+}
+
+response = ai.chat(payload, access_token, "gemini-2.5-flash-lite")
+print(response)
 ```
 
 ## License

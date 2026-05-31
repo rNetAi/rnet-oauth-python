@@ -192,6 +192,91 @@ class RNetAi:
         except urllib.error.HTTPError as e:
             self._handle_error(e)
 
+    def gemini_file_upload(self, access_token: str, model: str, file_data: bytes, mime_type: str, display_name: str = "") -> Dict[str, Any]:
+        """Uploads a file for use with Gemini models. (Untested)"""
+        return self._upload_file(access_token, model, file_data, mime_type, display_name)
+
+    def openai_file_upload(self, access_token: str, model: str, file_data: bytes, mime_type: str, display_name: str = "") -> Dict[str, Any]:
+        """Uploads a file for use with OpenAI models. (Untested)"""
+        return self._upload_file(access_token, model, file_data, mime_type, display_name)
+
+    def claude_file_upload(self, access_token: str, model: str, file_data: bytes, mime_type: str, display_name: str = "") -> Dict[str, Any]:
+        """Uploads a file for use with Claude models. (Untested)"""
+        return self._upload_file(access_token, model, file_data, mime_type, display_name)
+
+    def openai_file_delete(self, access_token: str, model: str, file_id: str) -> Dict[str, Any]:
+        """Deletes a file previously uploaded for OpenAI models. (Untested)"""
+        return self._delete_file(access_token, model, file_id)
+
+    def claude_file_delete(self, access_token: str, model: str, file_id: str) -> Dict[str, Any]:
+        """Deletes a file previously uploaded for Claude models. (Untested)"""
+        return self._delete_file(access_token, model, file_id)
+
+    def _upload_file(self, access_token: str, model: str, file_data: bytes, mime_type: str, display_name: str) -> Dict[str, Any]:
+        if not access_token: raise ValueError("access_token is required")
+        if not model: raise ValueError("model is required")
+        if not file_data: raise ValueError("file_data is required")
+        if not mime_type: raise ValueError("mime_type is required")
+
+        query = urlencode({"access_token": access_token, "model": model})
+        url = f"{AI_PROVIDER}/ai/upload?{query}"
+
+        import uuid
+        boundary = uuid.uuid4().hex
+        
+        body = bytearray()
+        
+        # Add file part
+        body.extend(f"--{boundary}\r\n".encode('utf-8'))
+        filename = display_name if display_name else "file"
+        body.extend(f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode('utf-8'))
+        body.extend(f'Content-Type: {mime_type}\r\n\r\n'.encode('utf-8'))
+        body.extend(file_data)
+        body.extend(b'\r\n')
+        
+        # Add mimeType part
+        body.extend(f"--{boundary}\r\n".encode('utf-8'))
+        body.extend(b'Content-Disposition: form-data; name="mimeType"\r\n\r\n')
+        body.extend(mime_type.encode('utf-8'))
+        body.extend(b'\r\n')
+        
+        # Add displayName part
+        body.extend(f"--{boundary}\r\n".encode('utf-8'))
+        body.extend(b'Content-Disposition: form-data; name="displayName"\r\n\r\n')
+        body.extend(display_name.encode('utf-8'))
+        body.extend(b'\r\n')
+        
+        body.extend(f"--{boundary}--\r\n".encode('utf-8'))
+
+        req = urllib.request.Request(
+            url,
+            data=bytes(body),
+            headers={'Content-Type': f'multipart/form-data; boundary={boundary}'},
+            method='POST'
+        )
+
+        try:
+            with urllib.request.urlopen(req) as response:
+                return json.loads(response.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            self._handle_error(e)
+
+    def _delete_file(self, access_token: str, model: str, file_id: str) -> Dict[str, Any]:
+        if not access_token: raise ValueError("access_token is required")
+        if not model: raise ValueError("model is required")
+        if not file_id: raise ValueError("file_id is required")
+
+        query = urlencode({"access_token": access_token, "model": model, "fileId": file_id})
+        url = f"{AI_PROVIDER}/ai/upload?{query}"
+
+        req = urllib.request.Request(url, method='DELETE')
+
+        try:
+            with urllib.request.urlopen(req) as response:
+                return json.loads(response.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            self._handle_error(e)
+
     def _handle_error(self, e: urllib.error.HTTPError):
         try:
             error_data = json.loads(e.read().decode('utf-8'))
